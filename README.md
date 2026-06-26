@@ -42,23 +42,37 @@ Your URL: `https://<user>.github.io/<repo>/`. Open it on laptop **and** phone
 
 ---
 
-## 3. Turn on the morning WhatsApp push (CallMeBot) — ~3 min, free
+## 3. Turn on the morning WhatsApp push — Meta WhatsApp Cloud API (free, reliable)
 
-CallMeBot is a free service that lets a script send WhatsApp messages to **your own** number.
+**A. Create the app + WhatsApp product**
+1. [developers.facebook.com](https://developers.facebook.com) → log in → **My Apps → Create App**.
+2. Use case **Other** → type **Business** → name it `switch-plan` → Create.
+3. In the dashboard, find **WhatsApp → Set up** (create/select a Meta Business account if asked).
 
-1. Save **+34 684 72 39 62** to your phone contacts (e.g. as "CallMeBot").
-2. From WhatsApp, send that contact: **`I allow callmebot to send me messages`**
-   Wait for the reply: *"API Activated…"* — it contains your **apikey**.
-3. In the GitHub repo: **Settings → Secrets and variables → Actions → New repository secret**:
-   - `CALLMEBOT_PHONE` = your WhatsApp number with country code, e.g. `+9198XXXXXXXX`
-   - `CALLMEBOT_APIKEY` = the apikey from step 2
-4. Test it now: **Actions → Morning push → Run workflow**. You should get a WhatsApp message.
+**B. Test sender + your number**
+4. **WhatsApp → API Setup.** Copy the **Phone number ID** (under the test "From" number).
+5. Under "To", **add your WhatsApp number** and verify the code Meta sends you.
+
+**C. Create the message template**
+6. **WhatsApp → Message templates → Create template:**
+   - Name: `daily_plan` · Category: **Utility** · Language: **English (en)**
+   - Body: `🌅 Day {{1}} of your Switch Plan — {{2}}. Open your tracker for today's tasks + video links and check them off. Let's go 💪`
+   - Button → **Visit website**: text `Open tracker`, URL `https://yashhhguptaaa.github.io/switch-plan/`
+   - Sample values: {{1}}=`1`, {{2}}=`JS foundations`. **Submit** (approves in minutes).
+
+**D. Permanent access token**
+7. [business.facebook.com](https://business.facebook.com) → **Business settings → Users → System users → Add** → role **Admin**.
+8. **Generate new token** → select your app → permissions **whatsapp_business_messaging** + **whatsapp_business_management** → Generate → copy it (shown once).
+
+**E. Three secrets** (repo **Settings → Secrets and variables → Actions**):
+- `WA_TOKEN` = the token from step 8
+- `WA_PHONE_ID` = the Phone number ID from step 4
+- `WA_TO` = your number, country code + digits only, e.g. `9198XXXXXXXX`
+
+Then test: **Actions → Morning push → Run workflow**.
 
 Daily time: edit the `cron` in `.github/workflows/morning-push.yml`
 (`30 1 * * *` = 07:00 IST). Start date / timezone / app URL: edit `meta` in `curriculum.json`.
-
-> CallMeBot is a free personal-use service. If a message ever doesn't arrive, just re-run the
-> workflow. The tracker itself never depends on it.
 
 ---
 

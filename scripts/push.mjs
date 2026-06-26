@@ -1,10 +1,11 @@
-// Sends today's plan to WhatsApp via CallMeBot (free). Run by GitHub Actions each morning.
-// Needs env: CALLMEBOT_PHONE (your WhatsApp number incl. country code), CALLMEBOT_APIKEY
+// Sends today's plan to WhatsApp via Meta WhatsApp Cloud API (template message).
+// Env: WA_TOKEN, WA_PHONE_ID, WA_TO   (optional: WA_TEMPLATE=daily_plan, WA_LANG=en)
 import { readFile } from "node:fs/promises";
 
-const PHONE = process.env.CALLMEBOT_PHONE;
-const APIKEY = process.env.CALLMEBOT_APIKEY;
-if (!PHONE || !APIKEY) { console.error("Missing CALLMEBOT_PHONE / CALLMEBOT_APIKEY"); process.exit(1); }
+const { WA_TOKEN, WA_PHONE_ID, WA_TO } = process.env;
+const TEMPLATE = process.env.WA_TEMPLATE || "daily_plan";
+const LANG = process.env.WA_LANG || "en";
+if (!WA_TOKEN || !WA_PHONE_ID || !WA_TO) { console.error("Missing WA_TOKEN / WA_PHONE_ID / WA_TO"); process.exit(1); }
 
 const data = JSON.parse(await readFile(new URL("../curriculum.json", import.meta.url)));
 const { days, meta } = data;
@@ -12,23 +13,33 @@ const { days, meta } = data;
 const tz = meta.timezone || "Asia/Kolkata";
 const todayStr = new Intl.DateTimeFormat("en-CA", { timeZone: tz }).format(new Date()); // YYYY-MM-DD
 const dayIdx = Math.round((Date.parse(todayStr) - Date.parse(meta.startDate)) / 86400000);
+if (dayIdx < 0 || dayIdx >= days.length) { console.log("No plan day for today (idx", dayIdx, ") — skipping."); process.exit(0); }
+const D = days[dayIdx];
 
-const TAG = { dsa:"DSA", fe:"FE", mc:"BUILD", fsd:"FE-SD", sd:"BACKEND", beh:"STORY", ai:"AI", task:"TASK", mock:"MOCK" };
+// Template body has two variables: {{1}} = day number, {{2}} = theme. The "Open tracker"
+// URL button is static in the template, so no button params are sent here.
+const body = {
+  messaging_product: "whatsapp",
+  to: WA_TO,
+  type: "template",
+  template: {
+    name: TEMPLATE,
+    language: { code: LANG },
+    components: [{
+      type: "body",
+      parameters: [
+        { type: "text", text: String(dayIdx + 1) },
+        { type: "text", text: D.th }
+      ]
+    }]
+  }
+};
 
-let msg;
-if (dayIdx < 0) {
-  msg = `🌅 *Switch Plan*\nStarts ${new Date(Date.parse(meta.startDate)).toDateString()}. Rest up — the grind begins soon. 💪`;
-} else if (dayIdx >= days.length) {
-  msg = `🎉 *Plan complete.* You're interview-ready. Go get the offer.`;
-} else {
-  const D = days[dayIdx];
-  const lines = D.it.map(([cat, text]) => `• *[${TAG[cat] || cat}]* ${text}`);
-  msg = `🌅 *Day ${dayIdx + 1} · Week ${D.w} · ${D.d}*\n_${D.th}_\n\n${lines.join("\n")}\n\n` +
-        `▶ Open tracker (links + check-off): ${meta.appUrl}`;
-}
-
-const url = `https://api.callmebot.com/whatsapp.php?phone=${encodeURIComponent(PHONE)}&text=${encodeURIComponent(msg)}&apikey=${encodeURIComponent(APIKEY)}`;
-const r = await fetch(url);
-const body = await r.text();
-if (!r.ok) { console.error("CallMeBot HTTP", r.status, body.slice(0, 300)); process.exit(1); }
-console.log("Sent day", dayIdx + 1, "-", body.slice(0, 120));
+const r = await fetch(`https://graph.facebook.com/v21.0/${WA_PHONE_ID}/messages`, {
+  method: "POST",
+  headers: { "Authorization": `Bearer ${WA_TOKEN}`, "Content-Type": "application/json" },
+  body: JSON.stringify(body)
+});
+const out = await r.json();
+if (!r.ok) { console.error("WhatsApp API error:", JSON.stringify(out)); process.exit(1); }
+console.log("Sent day", dayIdx + 1, "- message id:", out.messages?.[0]?.id);
