@@ -42,18 +42,23 @@ Your URL: `https://<user>.github.io/<repo>/`. Open it on laptop **and** phone
 
 ---
 
-## 3. Turn on the morning push (Telegram) — ~5 min, free
+## 3. Turn on the morning WhatsApp push (CallMeBot) — ~3 min, free
 
-1. In Telegram, message **@BotFather** → `/newbot` → copy the **bot token**.
-2. Message your new bot once (say "hi"), then open
-   `https://api.telegram.org/bot<TOKEN>/getUpdates` in a browser and copy your numeric **chat id**.
+CallMeBot is a free service that lets a script send WhatsApp messages to **your own** number.
+
+1. Save **+34 684 72 39 62** to your phone contacts (e.g. as "CallMeBot").
+2. From WhatsApp, send that contact: **`I allow callmebot to send me messages`**
+   Wait for the reply: *"API Activated…"* — it contains your **apikey**.
 3. In the GitHub repo: **Settings → Secrets and variables → Actions → New repository secret**:
-   - `TELEGRAM_TOKEN` = the bot token
-   - `TELEGRAM_CHAT_ID` = your chat id
-4. Test it now: **Actions → Morning push → Run workflow**. You should get a message.
+   - `CALLMEBOT_PHONE` = your WhatsApp number with country code, e.g. `+9198XXXXXXXX`
+   - `CALLMEBOT_APIKEY` = the apikey from step 2
+4. Test it now: **Actions → Morning push → Run workflow**. You should get a WhatsApp message.
 
 Daily time: edit the `cron` in `.github/workflows/morning-push.yml`
-(`30 1 * * *` = 07:00 IST). Start date / timezone: edit `meta` in `curriculum.json`.
+(`30 1 * * *` = 07:00 IST). Start date / timezone / app URL: edit `meta` in `curriculum.json`.
+
+> CallMeBot is a free personal-use service. If a message ever doesn't arrive, just re-run the
+> workflow. The tracker itself never depends on it.
 
 ---
 
