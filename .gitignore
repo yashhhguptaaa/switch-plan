@@ -1,0 +1,5 @@
+.DS_Store
+node_modules/
+
+# pushed separately (needs workflow scope)
+.github/workflows/morning-push.yml

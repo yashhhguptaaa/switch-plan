@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#0f1117">
+<title>Switch Plan · Senior Frontend</title>
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+  :root{
+    --bg:#0f1117; --card:#171a23; --card2:#1d212c; --line:#2a2f3d;
+    --txt:#e7e9ee; --mut:#8b93a7; --acc:#7c5cff;
+    --dsa:#3b82f6; --fe:#a855f7; --mc:#f59e0b; --fsd:#14b8a6;
+    --sd:#64748b; --beh:#22c55e; --ai:#ec4899; --task:#eab308; --mock:#ef4444;
+    --done:#22c55e; --retry:#f59e0b;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--bg);color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    line-height:1.5;padding-bottom:48px}
+  .wrap{max-width:680px;margin:0 auto;padding:14px 16px}
+  header{position:sticky;top:0;background:linear-gradient(180deg,var(--bg) 78%,transparent);
+    padding:12px 0 8px;z-index:5}
+  .top{display:flex;align-items:flex-start;gap:10px}
+  h1{font-size:17px;margin:0;font-weight:700;letter-spacing:-.02em;flex:1}
+  .sub{color:var(--mut);font-size:12px;margin-top:2px}
+  .sync{font-size:11px;border:1px solid var(--line);background:var(--card2);color:var(--mut);
+    border-radius:8px;padding:6px 9px;cursor:pointer;white-space:nowrap}
+  .sync.on{color:var(--done);border-color:var(--done)}
+  .bar{height:7px;background:var(--card2);border-radius:99px;margin-top:11px;overflow:hidden}
+  .bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),#22c55e);width:0;transition:width .4s}
+  .meta{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mut);margin-top:6px}
+  .nav{display:flex;align-items:center;gap:8px;margin:16px 0 8px}
+  .nav button{background:var(--card2);border:1px solid var(--line);color:var(--txt);
+    border-radius:9px;padding:7px 11px;font-size:13px;cursor:pointer}
+  .nav button:active{transform:scale(.96)}
+  .nav .now{margin-left:auto;background:var(--acc);border-color:var(--acc);font-weight:600}
+  .daytitle{font-size:15px;font-weight:700;margin:4px 0 2px}
+  .daytheme{color:var(--mut);font-size:12.5px;margin-bottom:10px}
+  .sec{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);
+    margin:18px 0 8px;font-weight:700}
+  .item{background:var(--card);border:1px solid var(--line);border-radius:13px;
+    padding:12px 13px;margin-bottom:9px;display:flex;gap:11px;align-items:flex-start;
+    transition:opacity .2s,border-color .2s}
+  .item.done{opacity:.5;border-color:var(--done)}
+  .item.retry{border-color:var(--retry)}
+  .tag{flex:0 0 auto;font-size:9.5px;font-weight:800;letter-spacing:.04em;
+    padding:3px 7px;border-radius:6px;color:#0c0e13;margin-top:1px;min-width:44px;text-align:center}
+  .body{flex:1;min-width:0}
+  .txt{font-size:14px}
+  .item.done .txt{text-decoration:line-through;text-decoration-color:var(--mut)}
+  .reslink{display:inline-block;margin-top:5px;font-size:11.5px;color:var(--acc);text-decoration:none}
+  .reslink:hover{text-decoration:underline}
+  .due{font-size:11px;color:var(--retry);font-weight:600;margin-top:3px}
+  .btns{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
+  .btns button{border:1px solid var(--line);background:var(--card2);color:var(--txt);
+    border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;font-weight:600}
+  .btns button:active{transform:scale(.95)}
+  .btns .d.on{background:var(--done);border-color:var(--done);color:#06210f}
+  .btns .r.on{background:var(--retry);border-color:var(--retry);color:#241701}
+  .empty{background:var(--card);border:1px dashed var(--line);border-radius:13px;
+    padding:26px;text-align:center;color:var(--mut)}
+  .info{margin-top:26px;border-top:1px solid var(--line);padding-top:16px}
+  details{background:var(--card);border:1px solid var(--line);border-radius:11px;
+    padding:11px 13px;margin-bottom:9px;font-size:13px}
+  details summary{cursor:pointer;font-weight:600;font-size:13.5px}
+  details p,details li{color:var(--mut);font-size:12.5px}
+  details a{color:var(--acc)}
+  .foot{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  .foot button{background:none;border:1px solid var(--line);color:var(--mut);
+    border-radius:8px;padding:6px 11px;font-size:11.5px;cursor:pointer}
+  .legend{display:flex;flex-wrap:wrap;gap:6px 10px;margin-top:8px}
+  .legend span{font-size:10px;color:var(--mut);display:flex;align-items:center;gap:4px}
+  .legend i{width:9px;height:9px;border-radius:3px;display:inline-block}
+  .banner{background:#1d212c;border:1px solid var(--line);border-radius:10px;padding:9px 12px;
+    font-size:12px;color:var(--mut);margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="top">
+      <div style="flex:1">
+        <h1>Switch Plan — Senior Frontend</h1>
+        <div class="sub">Big-tech / Uber · 8 weeks · JavaScript</div>
+      </div>
+      <button class="sync" id="sync">· · ·</button>
+    </div>
+    <div class="bar"><i id="barfill"></i></div>
+    <div class="meta"><span id="prog"></span><span id="streak"></span></div>
+  </header>
+  <div id="due"></div>
+  <div class="nav">
+    <button data-nav="prev">‹ Prev</button>
+    <button data-nav="next">Next ›</button>
+    <button class="now" data-nav="now">Jump to today</button>
+  </div>
+  <div id="day"></div>
+  <div class="info">
+    <div class="sec">Reference</div>
+    <details><summary>The RADIO framework (frontend system design)</summary>
+      <p><b>R</b>equirements · <b>A</b>rchitecture/components · <b>D</b>ata model · <b>I</b>nterface (API) · <b>O</b>ptimizations (perf, a11y, edge cases). Say the letters out loud as you go — interviewers grade structure.</p>
+    </details>
+    <details><summary>How AI interview rounds work (2026, verified)</summary>
+      <ul>
+        <li><b>Google:</b> CoderPad 3-panel (files + editor + AI chat), 60 min, phases: bug-fix → implement → optimize.</li>
+        <li><b>Meta:</b> pick your model; graded on problem-solving, code quality, <b>verification</b>, communication.</li>
+        <li><b>The trap:</b> accepting plausible-but-wrong AI output = fastest reject. They plant bugs. Never say "the AI wrote it."</li>
+        <li><b>Prep:</b> build with AI, then explain & verify every line. Ask up front: "AI-allowed or AI-off?"</li>
+      </ul>
+    </details>
+    <details><summary>Uber senior FE loop (2026)</summary>
+      <p>DSA coding → Tech Specialization (vanilla-JS machine coding: DOM, async, ES6) → Frontend System Design → Leadership/behavioral → sometimes a project deep-dive. Prep your strongest FE project to discuss end-to-end.</p>
+    </details>
+    <details><summary>Job-search timing</summary>
+      <p>Wk1 polish resume · Wk4 ask referrals · Wk5–6 apply so onsites land Wk8–10 at peak · batch interviews for leverage.</p>
+    </details>
+    <div class="legend" id="legend"></div>
+    <div class="foot">
+      <button id="reset">Reset all progress</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+/* ===== Firebase sync (cross-device). Replace the placeholder config to enable. ===== */
+const firebaseConfig = {
+  apiKey: "REPLACE_ME",
+  authDomain: "REPLACE_ME",
+  projectId: "REPLACE_ME",
+  appId: "REPLACE_ME"
+};
+const SYNC = firebaseConfig.apiKey !== "REPLACE_ME";
+
+let CUR=[], RES={}, META={};
+const KEY="switchPlan_v2";
+let state=JSON.parse(localStorage.getItem(KEY)||"null")||{status:{},retries:[]};
+if(!state.retries)state.retries=[];
+let user=null, docRef=null, fb=null;
+
+const CAT={dsa:["DSA","--dsa"],fe:["FE","--fe"],mc:["BUILD","--mc"],fsd:["FE SD","--fsd"],
+  sd:["BACK","--sd"],beh:["STORY","--beh"],ai:["AI","--ai"],task:["TASK","--task"],mock:["MOCK","--mock"]};
+
+function todayStr(){const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10);}
+function addDays(s,n){const d=new Date(s+"T00:00:00");d.setDate(d.getDate()+n);return new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10);}
+function saveLocal(){localStorage.setItem(KEY,JSON.stringify(state));}
+async function persist(){saveLocal(); if(user&&docRef){try{await fb.setDoc(docRef,state);}catch(e){console.warn("sync write failed",e);}}}
+
+function dayComplete(i){return CUR[i].it.every((_,j)=>state.status[i+"-"+j]);}
+function currentDay(){for(let i=0;i<CUR.length;i++)if(!dayComplete(i))return i;return CUR.length-1;}
+let view=null;
+
+function setStatus(i,j,val){
+  const k=i+"-"+j;
+  if(state.status[k]===val){delete state.status[k]; if(val==="retry")removeRetry(k);}
+  else{state.status[k]=val; if(val==="retry")addRetry(k,CUR[i].it[j]); else removeRetry(k);}
+  persist();render();
+}
+function addRetry(src,it){
+  const ex=state.retries.find(r=>r.src===src); const due=addDays(todayStr(),3);
+  if(ex){ex.due=due;ex.n++;}else state.retries.push({src,cat:it[0],txt:it[1],due,n:1});
+}
+function removeRetry(src){state.retries=state.retries.filter(r=>r.src!==src);}
+function retryDone(src){removeRetry(src);persist();render();}
+function retryAgain(src){const r=state.retries.find(x=>x.src===src);if(r){r.due=addDays(todayStr(),3);r.n++;}persist();render();}
+
+function tag(cat){const c=CAT[cat]||["?","--mut"];return `<span class="tag" style="background:var(${c[1]})">${c[0]}</span>`;}
+function resLink(key){const r=RES[key];if(!r)return"";return `<a class="reslink" href="${r.u}" target="_blank" rel="noopener">↗ ${r.l}</a>`;}
+
+function render(){
+  if(!CUR.length)return;
+  const done=Object.keys(state.status).length;
+  const total=CUR.reduce((a,x)=>a+x.it.length,0);
+  document.getElementById("barfill").style.width=(done/total*100)+"%";
+  document.getElementById("prog").textContent=done+" / "+total+" items done";
+  const pend=state.retries.length;
+  document.getElementById("streak").textContent=pend?("↻ "+pend+" to revisit"):"no pending revisits";
+
+  const today=todayStr();
+  const due=state.retries.filter(r=>r.due<=today);
+  let dh="";
+  if(due.length){
+    dh+=`<div class="sec">↻ Revisit today (you marked these to retry)</div>`;
+    due.forEach(r=>{ dh+=`<div class="item retry"><div>${tag(r.cat)}</div><div class="body"><div class="txt">${r.txt}</div>
+      <div class="due">attempt #${r.n+1}</div>
+      <div class="btns"><button class="d" data-act="rdone" data-src="${r.src}">✓ Got it now</button>
+      <button class="r" data-act="ragain" data-src="${r.src}">↻ Still shaky, +3d</button></div></div></div>`; });
+  }
+  document.getElementById("due").innerHTML=dh;
+
+  const cur=currentDay();
+  let v=view==null?cur:Math.max(0,Math.min(CUR.length-1,view));
+  const D=CUR[v];
+  let h=`<div class="daytitle">Week ${D.w} · ${D.d}${v===cur?'  ·  TODAY':''}</div>`;
+  h+=`<div class="daytheme">${D.th}</div>`;
+  D.it.forEach((it,j)=>{
+    const st=state.status[v+"-"+j];
+    h+=`<div class="item ${st||''}"><div>${tag(it[0])}</div><div class="body">
+      <div class="txt">${it[1]}</div>${resLink(it[2])}
+      <div class="btns">
+        <button class="d ${st==='done'?'on':''}" data-act="done" data-i="${v}" data-j="${j}">✓ Done</button>
+        <button class="r ${st==='retry'?'on':''}" data-act="retry" data-i="${v}" data-j="${j}">↻ Did it, redo in 3d</button>
+      </div></div></div>`;
+  });
+  if(cur===CUR.length-1 && dayComplete(cur) && v===cur)
+    h=`<div class="empty">🎉 Plan complete. Go get the offer.</div>`+h;
+  document.getElementById("day").innerHTML=h;
+
+  document.getElementById("legend").innerHTML=Object.keys(CAT).map(k=>
+    `<span><i style="background:var(${CAT[k][1]})"></i>${CAT[k][0]}</span>`).join("");
+}
+
+/* events (delegation — works inside module scope) */
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-act],[data-nav]"); if(!b)return;
+  if(b.dataset.nav){const cur=currentDay();
+    if(b.dataset.nav==="prev")view=(view==null?cur:view)-1;
+    else if(b.dataset.nav==="next")view=(view==null?cur:view)+1;
+    else view=null; render(); return;}
+  const a=b.dataset.act;
+  if(a==="done")setStatus(+b.dataset.i,+b.dataset.j,"done");
+  else if(a==="retry")setStatus(+b.dataset.i,+b.dataset.j,"retry");
+  else if(a==="rdone")retryDone(b.dataset.src);
+  else if(a==="ragain")retryAgain(b.dataset.src);
+});
+document.getElementById("reset").onclick=()=>{if(confirm("Erase all progress?")){state={status:{},retries:[]};persist();render();}};
+
+/* sync UI */
+const syncBtn=document.getElementById("sync");
+function setSyncLabel(){
+  if(!SYNC){syncBtn.textContent="Sync off";syncBtn.classList.remove("on");return;}
+  if(user){syncBtn.textContent="✓ "+(user.email||"synced").split("@")[0];syncBtn.classList.add("on");}
+  else{syncBtn.textContent="Sign in to sync";syncBtn.classList.remove("on");}
+}
+
+async function initFirebase(){
+  const [{initializeApp},auth,store]=await Promise.all([
+    import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"),
+    import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"),
+    import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js")
+  ]);
+  const app=initializeApp(firebaseConfig);
+  const authI=auth.getAuth(app), db=store.getFirestore(app);
+  fb={setDoc:store.setDoc, getDoc:store.getDoc};
+  const provider=new auth.GoogleAuthProvider();
+  syncBtn.onclick=()=>{ user?auth.signOut(authI):auth.signInWithPopup(authI,provider).catch(e=>alert("Sign-in failed: "+e.message)); };
+  auth.onAuthStateChanged(authI, async u=>{
+    user=u; setSyncLabel();
+    if(u){
+      docRef=store.doc(db,"plans",u.uid);
+      const snap=await store.getDoc(docRef);
+      const remote=snap.exists()?snap.data():{status:{},retries:[]};
+      const status={...(remote.status||{}),...state.status};
+      const rmap={}; [...(remote.retries||[]),...(state.retries||[])].forEach(r=>rmap[r.src]=r);
+      state={status,retries:Object.values(rmap)};
+      saveLocal(); await store.setDoc(docRef,state); render();
+      store.onSnapshot(docRef,s=>{ if(!s.exists())return; const d=s.data();
+        if(JSON.stringify(d)!==JSON.stringify(state)){state={status:d.status||{},retries:d.retries||[]};saveLocal();render();} });
+    } else { docRef=null; }
+  });
+}
+
+/* boot */
+fetch("curriculum.json").then(r=>r.json()).then(data=>{
+  CUR=data.days; RES=data.res; META=data.meta||{};
+  render(); setSyncLabel();
+  if(SYNC) initFirebase().catch(e=>console.warn("firebase init failed",e));
+  else { const b=document.createElement("div"); b.className="banner";
+    b.innerHTML="📱 <b>Sync is off.</b> Add your Firebase config to sync phone ↔ laptop. (Setup steps are in the README.)";
+    document.querySelector("header").after(b); }
+}).catch(e=>{ document.getElementById("day").innerHTML=
+  `<div class="empty">Couldn't load curriculum.json. Open this via the hosted URL or a local server (not file://).</div>`; });
+</script>
+</body>
+</html>
